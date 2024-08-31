@@ -122,6 +122,7 @@ container:
 ## @param persistence.bind.enabled Enable bind mount for persistence storage
 ## @param persistence.bind.hostpath Path in the host where to bind
 ## @param persistence.storageClass: Storage Class to use when creating the Persistent Volume Claim
+## @param persistence.resourcePolicy: Resource policy to use when uninstalling the chart
 ## @param persistence.dataDir.enabled Enable the PVC
 ## @param persistence.dataDir.size Size of the PVC
 ## @param persistence.shared.enabled Enable tha shared mount for a NFS file system or a shared bind point with for sharing assets between multiple game instances when not using s3.
@@ -147,6 +148,8 @@ persistence:
   ##   GKE, AWS & OpenStack)
   ##
   storageClass: ""
+  # Set resourcePolicy to "keep" to retain PVC after uninstalling the chart
+  resourcePolicy:
   dataDir:
     # Set this to false if you don't care to persist state between restarts.
     enabled: false

@@ -12,6 +12,9 @@ metadata:
   {{- if not (eq .Values.persistence.storageClass "-") }}
     volume.beta.kubernetes.io/storage-class: {{ default "default" .Values.persistence.storageClass | quote }}
   {{- end }}
+  {{- if .Values.persistence.resourcePolicy }}
+    helm.sh/resource-policy: {{ .Values.persistence.resourcePolicy | quote }}
+  {{- end }}
 spec:
   accessModes:
     - ReadWriteOnce
