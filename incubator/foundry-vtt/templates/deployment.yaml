@@ -201,6 +201,10 @@ spec:
           readOnly: {{ $mount.readOnly }}
         {{- end }}
       {{- end }}
+      {{- if eq .Values.persistence.backupDir.enabled true }}
+        - name: backup
+          mountPath: /data/Backups
+      {{- end }}
       {{- if eq .Values.foundryvtt.s3.enabled "file" }}
         - name: secret-aws
           mountPath: "/etc/secretaws/"
@@ -234,6 +238,27 @@ spec:
           claimName: {{ template "foundry-vtt.fullname" . }}
     {{- else }}
         emptyDir: {}
+    {{- end }}
+      - name: data
+    {{- if and (eq .Values.persistence.bind.enabled true) (eq .Values.persistence.dataDir.enabled false) }}
+        hostPath:
+          path: {{ .Values.persistence.bind.hostpath }}
+          type: Directory
+    {{- else if .Values.persistence.dataDir.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ template "foundry-vtt.fullname" . }}
+    {{- else }}
+        emptyDir: {}
+    {{- end }}
+    {{- if eq .Values.persistence.backupDir.enabled true }}
+      - name: backup
+        {{ if eq .Values.persistence.backupDir.type "nfs" }}
+        nfs:
+          server: {{ .Values.persistence.backupDir.server }}
+          path: {{ .Values.persistence.backupDir.path }}
+        {{ else }}
+        emptyDir: {}
+        {{- end }}
     {{- end }}
     {{- if eq .Values.persistence.shared.enabled true }}
       {{- range $i, $mount := .Values.persistence.shared.mounts }}
