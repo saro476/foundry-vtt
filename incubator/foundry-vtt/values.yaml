@@ -37,7 +37,7 @@ serviceAccount:
 image:
   pullPolicy: IfNotPresent
   repository: felddy/foundryvtt
-  tag: "11.315"
+  tag: "12.343"
 
 ## @param imagePullSecrets Credentials for Docker private repository.
 imagePullSecrets: []
@@ -53,10 +53,10 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   requests:
-    cpu: 500m
+    cpu: 2000m
     memory: 512Mi
   limits:
-    cpu: 1024m
+    cpu: 4000m
     memory: 1024Mi
 
 ## @section Pod Security and Scheduling
@@ -154,10 +154,9 @@ persistence:
     # Set this to false if you don't care to persist state between restarts.
     enabled: false
     size: 5Gi
-
-  backupDir:
+  backup:
+    type: "nfs"
     enabled: false
-    type: nfs
     server: ""
     path: ""
 
@@ -173,6 +172,29 @@ persistence:
     # - containerPath: "/files/assets"
     #   type: pvc
     #   claimName: "pvc-files"
+
+backup:
+  enabled: false
+  image:
+    repository: "ghcr.io/thehappykraken/backup-restore"
+    tag: "latest"
+  imagePullPolicy: Always
+  env:
+    CRON_BACKUP: "1"
+    CRON_TIME: "*/10 * * * *"
+    TIMEOUT: 300s
+    INIT_BACKUP: 1
+    INIT_BACKUP_DELAY: 300
+    EXIT_BACKUP: 1
+    MAX_BACKUPS: 10
+
+restore:
+  image:
+    repository: "ghcr.io/thehappykraken/backup-restore"
+    tag: "latest"
+  imagePullPolicy: Always
+  enabled: false
+  env: {}
 
 ## @section Service Parameters
 ## @param service.serviceType Type of Service to create, defaults to ClusterIP
